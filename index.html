@@ -2,29 +2,139 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>ส่งสรุปเวลาทำงาน</title>
+  <title>สรุปเวลาทำงาน</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
-    input, button { display: block; margin-top: 10px; padding: 8px; width: 100%; }
-    h2 { text-align: center; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f6f9;
+      color: #333;
+    }
+
+    header, footer {
+      background-color: #4a90e2;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4a90e2;
+    }
+
+    section {
+      margin-bottom: 24px;
+    }
+
+    section h3 {
+      color: #666;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    input {
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4a90e2;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #357ab8;
+    }
   </style>
 </head>
 <body>
-  <h2>สรุปเวลาทำงาน</h2>
-  
-  <input id="name" placeholder="ชื่อพนักงาน" />
-  <input id="workingDay" placeholder="จำนวนวันทำงาน" />
-  <input id="credit" placeholder="ชั่วโมง OT" />
-  <input id="qr" placeholder="เวลาสาย (นาที)" />
-  <input id="totalSales" placeholder="ยอดขาย (บาท)" />
-  <input id="leaveHave" placeholder="วันหยุดที่มี" />
-  <input id="leaveUsed" placeholder="วันหยุดที่ใช้ไป" />
-  <input id="holidayHave" placeholder="วันหยุดนักขัตฤกษ์ที่มี" />
-  <input id="holidayUsed" placeholder="วันหยุดนักขัตฤกษ์ที่ใช้ไป" />
-  <input id="accumulateAdd" placeholder="วันหยุดสะสมเพิ่ม" />
-  
-  <button onclick="sendMessage()">ส่งข้อความ</button>
+
+  <header>
+    <h1>📊 แบบฟอร์มสรุปเวลาทำงาน</h1>
+  </header>
+
+  <main>
+    <h2>กรอกข้อมูลประจำเดือน</h2>
+
+    <section>
+      <h3>🧑‍💼 ข้อมูลพนักงาน</h3>
+      <label>ชื่อพนักงาน</label>
+      <input id="name" placeholder="ชื่อพนักงาน" />
+    </section>
+
+    <section>
+      <h3>🕒 เวลาการทำงาน</h3>
+      <label>วันทำงาน</label>
+      <input id="workingDay" placeholder="เช่น 22" />
+      <label>โอที (ชั่วโมง)</label>
+      <input id="credit" placeholder="เช่น 5.5" />
+      <label>เวลาสาย (นาที)</label>
+      <input id="qr" placeholder="เช่น 10" />
+    </section>
+
+    <section>
+      <h3>💰 ยอดขาย</h3>
+      <label>ยอดขายรวม (บาท)</label>
+      <input id="totalSales" placeholder="เช่น 123456" />
+    </section>
+
+    <section>
+      <h3>📆 วันหยุด</h3>
+      <label>วันหยุดที่มี</label>
+      <input id="leaveHave" placeholder="เช่น 4" />
+      <label>วันหยุดที่ใช้ไป</label>
+      <input id="leaveUsed" placeholder="เช่น 2" />
+      <label>วันหยุดนักขัตฤกษ์ที่มี</label>
+      <input id="holidayHave" placeholder="เช่น 3" />
+      <label>วันหยุดนักขัตฤกษ์ที่ใช้ไป</label>
+      <input id="holidayUsed" placeholder="เช่น 1" />
+    </section>
+
+    <section>
+      <h3>➕ วันหยุดสะสม</h3>
+      <label>สะสมเพิ่ม</label>
+      <input id="accumulateAdd" placeholder="เช่น 1" />
+    </section>
+
+    <button onclick="sendMessage()">✅ ส่งข้อมูล</button>
+  </main>
+
+  <footer>
+    <p>Powered by LINE LIFF | @SophitDev</p>
+  </footer>
 
   <script>
     async function sendMessage() {
@@ -40,13 +150,12 @@
       const credit = document.getElementById('credit').value;
       const qr = document.getElementById('qr').value;
       const totalSales = document.getElementById('totalSales').value;
-      const cash = document.getElementById('leaveHave').value;
-      const cashUsed = document.getElementById('leaveUsed').value;
+      const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
+      const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
       const holiday = document.getElementById('holidayHave').value;
       const holidayUsed = document.getElementById('holidayUsed').value;
-      const accumulateAdd = document.getElementById('accumulateAdd').value;
-
-      const cashRemain = cash - cashUsed + parseInt(accumulateAdd || 0);
+      const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
+      const cashRemain = cash - cashUsed + accumulateAdd;
 
       const message = 
 `🕒 ส่งสรุปเวลาทำงานประจำเดือน
@@ -68,12 +177,13 @@ ${name}
         type: "text",
         text: message
       }]).then(() => {
-        alert("ส่งข้อความแล้ว");
+        alert("✅ ส่งข้อความแล้ว");
         liff.closeWindow();
       }).catch(err => {
-        alert("ไม่สามารถส่งข้อความ: " + err);
+        alert("❌ ไม่สามารถส่งข้อความ: " + err);
       });
     }
   </script>
+
 </body>
 </html>
