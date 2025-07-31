@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ส่งสรุปเวลาทำงาน</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+    input, button { display: block; margin-top: 10px; padding: 8px; width: 100%; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>สรุปเวลาทำงาน</h2>
+  
+  <input id="name" placeholder="ชื่อพนักงาน" />
+  <input id="workingDay" placeholder="จำนวนวันทำงาน" />
+  <input id="credit" placeholder="ชั่วโมง OT" />
+  <input id="qr" placeholder="เวลาสาย (นาที)" />
+  <input id="totalSales" placeholder="ยอดขาย (บาท)" />
+  <input id="leaveHave" placeholder="วันหยุดที่มี" />
+  <input id="leaveUsed" placeholder="วันหยุดที่ใช้ไป" />
+  <input id="holidayHave" placeholder="วันหยุดนักขัตฤกษ์ที่มี" />
+  <input id="holidayUsed" placeholder="วันหยุดนักขัตฤกษ์ที่ใช้ไป" />
+  <input id="accumulateAdd" placeholder="วันหยุดสะสมเพิ่ม" />
+  
+  <button onclick="sendMessage()">ส่งข้อความ</button>
+
+  <script>
+    async function sendMessage() {
+      await liff.init({ liffId: "2007788493-vwxmBkLE" });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const name = document.getElementById('name').value;
+      const workingDay = document.getElementById('workingDay').value;
+      const credit = document.getElementById('credit').value;
+      const qr = document.getElementById('qr').value;
+      const totalSales = document.getElementById('totalSales').value;
+      const cash = document.getElementById('leaveHave').value;
+      const cashUsed = document.getElementById('leaveUsed').value;
+      const holiday = document.getElementById('holidayHave').value;
+      const holidayUsed = document.getElementById('holidayUsed').value;
+      const accumulateAdd = document.getElementById('accumulateAdd').value;
+
+      const cashRemain = cash - cashUsed + parseInt(accumulateAdd || 0);
+
+      const message = 
+`🕒 ส่งสรุปเวลาทำงานประจำเดือน
+
+${name}
+วันทำงาน: ${workingDay} วัน
+โอที: ${credit} ชม.
+สาย: ${qr} นาที (ไม่หัก 15 นาที)
+💰 รวมยอดขาย: ${totalSales} บาท
+
+วันหยุดที่มี ${cash} วัน ใช้ไป ${cashUsed} วัน
+วันหยุดนักขัติฯที่มี ${holiday} วัน ใช้ไป ${holidayUsed} วัน
+
+วันหยุดสะสมที่มี ${cash} วัน
+ใช้ไป ${cashUsed} วัน สะสมเพิ่ม ${accumulateAdd} วัน
+คงเหลือ: ${cashRemain} วัน`;
+
+      liff.sendMessages([{
+        type: "text",
+        text: message
+      }]).then(() => {
+        alert("ส่งข้อความแล้ว");
+        liff.closeWindow();
+      }).catch(err => {
+        alert("ไม่สามารถส่งข้อความ: " + err);
+      });
+    }
+  </script>
+</body>
+</html>
