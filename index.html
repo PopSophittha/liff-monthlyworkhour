@@ -78,6 +78,16 @@
     button:hover {
       background-color: #357ab8;
     }
+
+    .flex-pair {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .flex-pair > div {
+      flex: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -97,13 +107,22 @@
 
     <section>
       <h3>🕒 เวลาการทำงาน</h3>
-      <label>วันทำงาน</label>
-      <input id="workingDay" type="number" placeholder="เช่น 22" />
-      <label>โอที (ชั่วโมง)</label>
-      <input id="credit" type="number" placeholder="เช่น 5" />
+      
+      <div class="flex-pair">
+        <div>
+          <label>วันทำงาน</label>
+          <input id="workingDay" type="number" placeholder="เช่น 22" />
+        </div>
+        <div>
+          <label>โอที (ชั่วโมง)</label>
+          <input id="credit" type="number" placeholder="เช่น 5" />
+        </div>
+      </div>
+    
       <label>เวลาสาย (นาที)</label>
       <input id="qr" type="number" placeholder="เช่น 10" />
     </section>
+
 
     <section>
       <h3>💰 ยอดขาย</h3>
