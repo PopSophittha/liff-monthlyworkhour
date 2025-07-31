@@ -154,12 +154,18 @@
   const credit = document.getElementById('credit').value;
   const qr = document.getElementById('qr').value;
   const totalSales = document.getElementById('totalSales').value;
+
   const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
   const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
   const holiday = document.getElementById('holidayHave').value;
   const holidayUsed = document.getElementById('holidayUsed').value;
+
+  const accumulateHave = parseFloat(document.getElementById('accumulateHave').value) || 0;
+  const accumulateUsed = parseFloat(document.getElementById('accumulateUsed').value) || 0;
   const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
-  const cashRemain = cash - cashUsed + accumulateAdd;
+
+  // คำนวณคงเหลือวันหยุดสะสม
+  const accumulateRemain = accumulateHave + accumulateAdd - accumulateUsed;
 
   const message = 
 `🕒 ส่งสรุปเวลาทำงานประจำเดือน
