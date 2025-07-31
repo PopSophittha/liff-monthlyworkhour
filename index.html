@@ -132,24 +132,52 @@
 
     <section>
       <h3>📆 วันหยุด</h3>
-      <label>วันหยุดที่มี</label>
-      <input id="leaveHave" type="number" placeholder="เช่น 4" />
-      <label>วันหยุดที่ใช้ไป</label>
-      <input id="leaveUsed" type="number" placeholder="เช่น 2" />
-      <label>วันหยุดนักขัตฤกษ์ที่มี</label>
-      <input id="holidayHave" type="number" placeholder="เช่น 3" />
-      <label>วันหยุดนักขัตฤกษ์ที่ใช้ไป</label>
-      <input id="holidayUsed" type="number" placeholder="เช่น 1" />
+    
+      <div class="flex-pair">
+        <div>
+          <label>วันหยุดที่มี</label>
+          <input id="leaveHave" type="number" placeholder="เช่น 4" />
+        </div>
+        <div>
+          <label>วันหยุดที่ใช้ไป</label>
+          <input id="leaveUsed" type="number" placeholder="เช่น 2" />
+        </div>
+      </div>
+    
+      <div class="flex-pair">
+        <div>
+          <label>วันหยุดนักขัตฤกษ์ที่มี</label>
+          <input id="holidayHave" type="number" placeholder="เช่น 3" />
+        </div>
+        <div>
+          <label>วันหยุดนักขัตฤกษ์ที่ใช้ไป</label>
+          <input id="holidayUsed" type="number" placeholder="เช่น 1" />
+        </div>
+      </div>
     </section>
+
 
     <section>
       <h3>➕ วันหยุดสะสม</h3>
+    
       <label>วันหยุดสะสมที่มี</label>
-      <input id="accumulateHave" type="number" placeholder="เช่น 5" />
-      <label>ใช้ไป</label>
-      <input id="accumulateUsed" type="number" placeholder="เช่น 2" />
-      <label>สะสมเพิ่ม</label>
-      <input id="accumulateAdd" type="number" placeholder="เช่น 1" />
+      <input id="accumulateHave" type="number" placeholder="เช่น 5" oninput="calculateRemain()" />
+    
+      <div class="flex-pair">
+        <div>
+          <label>ใช้ไป</label>
+          <input id="accumulateUsed" type="number" placeholder="เช่น 2" oninput="calculateRemain()" />
+        </div>
+        <div>
+          <label>สะสมเพิ่ม</label>
+          <input id="accumulateAdd" type="number" placeholder="เช่น 1" oninput="calculateRemain()" />
+        </div>
+      </div>
+    
+      <div style="margin-top: 10px;">
+        <strong>วันหยุดสะสมคงเหลือ:</strong>
+        <span id="accumulateRemainText">-</span> วัน
+      </div>
     </section>
 
     <button onclick="sendMessage()">✅ ส่งข้อมูล</button>
@@ -161,59 +189,66 @@
 
   <script>
     async function sendMessage() {
-  await liff.init({ liffId: "2007788493-7JGgNED8" });
-
-  if (!liff.isLoggedIn()) {
-    liff.login();
-    return;
+      await liff.init({ liffId: "2007788493-7JGgNED8" });
+    
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+    
+      const name = document.getElementById('name').value;
+      const workingDay = document.getElementById('workingDay').value;
+      const credit = document.getElementById('credit').value;
+      const qr = document.getElementById('qr').value;
+      const totalSales = document.getElementById('totalSales').value;
+    
+      const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
+      const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
+      const holiday = document.getElementById('holidayHave').value;
+      const holidayUsed = document.getElementById('holidayUsed').value;
+    
+      const accumulateHave = parseFloat(document.getElementById('accumulateHave').value) || 0;
+      const accumulateUsed = parseFloat(document.getElementById('accumulateUsed').value) || 0;
+      const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
+    
+      // คำนวณคงเหลือวันหยุดสะสม
+      const accumulateRemain = accumulateHave + accumulateAdd - accumulateUsed;
+    
+      const message = 
+    `🕒 ส่งสรุปเวลาทำงานประจำเดือน
+    
+    ${name}
+    วันทำงาน: ${workingDay} วัน
+    โอที: ${credit} ชม.
+    สาย: ${qr} นาที (หัก 15 นาทีแล้ว คงเหลือ ${Math.max(qr - 15, 0)} นาที)
+    💰 รวมยอดขาย: ${totalSales} บาท
+    
+    วันหยุดที่มี ${cash} วัน ใช้ไป ${cashUsed} วัน
+    วันหยุดนักขัติฯที่มี ${holiday} วัน ใช้ไป ${holidayUsed} วัน
+    
+    วันหยุดสะสมที่มี ${accumulateHave} วัน
+    ใช้ไป ${accumulateUsed} วัน
+    สะสมเพิ่ม ${accumulateAdd} วัน
+    คงเหลือ: ${accumulateRemain} วัน`;
+    
+      liff.sendMessages([{
+        type: "text",
+        text: message
+      }]).then(() => {
+        alert("✅ ส่งข้อความแล้ว");
+        liff.closeWindow();
+      }).catch(err => {
+        alert("❌ ไม่สามารถส่งข้อความ: " + err);
+      });
+    }
+    
+  function calculateRemain() {
+    const have = parseFloat(document.getElementById("accumulateHave").value) || 0;
+    const used = parseFloat(document.getElementById("accumulateUsed").value) || 0;
+    const add = parseFloat(document.getElementById("accumulateAdd").value) || 0;
+    const remain = have - used + add;
+    document.getElementById("accumulateRemainText").textContent = remain.toFixed(1);
   }
-
-  const name = document.getElementById('name').value;
-  const workingDay = document.getElementById('workingDay').value;
-  const credit = document.getElementById('credit').value;
-  const qr = document.getElementById('qr').value;
-  const totalSales = document.getElementById('totalSales').value;
-
-  const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
-  const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
-  const holiday = document.getElementById('holidayHave').value;
-  const holidayUsed = document.getElementById('holidayUsed').value;
-
-  const accumulateHave = parseFloat(document.getElementById('accumulateHave').value) || 0;
-  const accumulateUsed = parseFloat(document.getElementById('accumulateUsed').value) || 0;
-  const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
-
-  // คำนวณคงเหลือวันหยุดสะสม
-  const accumulateRemain = accumulateHave + accumulateAdd - accumulateUsed;
-
-  const message = 
-`🕒 ส่งสรุปเวลาทำงานประจำเดือน
-
-${name}
-วันทำงาน: ${workingDay} วัน
-โอที: ${credit} ชม.
-สาย: ${qr} นาที (ไม่หัก 15 นาที)
-💰 รวมยอดขาย: ${totalSales} บาท
-
-วันหยุดที่มี ${cash} วัน ใช้ไป ${cashUsed} วัน
-วันหยุดนักขัติฯที่มี ${holiday} วัน ใช้ไป ${holidayUsed} วัน
-
-วันหยุดสะสมที่มี ${accumulateHave} วัน
-ใช้ไป ${accumulateUsed} วัน
-สะสมเพิ่ม ${accumulateAdd} วัน
-คงเหลือ: ${accumulateRemain} วัน`;
-
-  liff.sendMessages([{
-    type: "text",
-    text: message
-  }]).then(() => {
-    alert("✅ ส่งข้อความแล้ว");
-    liff.closeWindow();
-  }).catch(err => {
-    alert("❌ ไม่สามารถส่งข้อความ: " + err);
-  });
-}
-
   </script>
 
 </body>
