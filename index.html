@@ -188,32 +188,39 @@
 
   <script>
     async function sendMessage() {
-      await liff.init({ liffId: "2007788493-7JGgNED8" });
+      try {
+        await liff.init({ liffId: "2007788493-7JGgNED8" });
     
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
     
-      const name = document.getElementById('name').value;
-      const workingDay = document.getElementById('workingDay').value;
-      const credit = document.getElementById('credit').value;
-      const qr = document.getElementById('qr').value;
-      const totalSales = document.getElementById('totalSales').value;
+        // รอให้ LIFF พร้อมก่อนใช้งาน
+        if (!liff.isApiAvailable('sendMessages')) {
+          alert('ไม่สามารถส่งข้อความได้ เนื่องจาก LIFF API ไม่พร้อมใช้งาน');
+          return;
+        }
     
-      const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
-      const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
-      const holiday = document.getElementById('holidayHave').value;
-      const holidayUsed = document.getElementById('holidayUsed').value;
+        // ดึงข้อมูลจาก input
+        const name = document.getElementById('name').value;
+        const workingDay = document.getElementById('workingDay').value;
+        const credit = document.getElementById('credit').value;
+        const qr = document.getElementById('qr').value;
+        const totalSales = document.getElementById('totalSales').value;
     
-      const accumulateHave = parseFloat(document.getElementById('accumulateHave').value) || 0;
-      const accumulateUsed = parseFloat(document.getElementById('accumulateUsed').value) || 0;
-      const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
+        const cash = parseFloat(document.getElementById('leaveHave').value) || 0;
+        const cashUsed = parseFloat(document.getElementById('leaveUsed').value) || 0;
+        const holiday = parseFloat(document.getElementById('holidayHave').value) || 0;
+        // const holidayUsed = parseFloat(document.getElementById('holidayUsed').value) || 0; // คุณไม่ได้ใช้แล้ว
     
-      // คำนวณคงเหลือวันหยุดสะสม
-      const accumulateRemain = accumulateHave + accumulateAdd - accumulateUsed;
+        const accumulateHave = parseFloat(document.getElementById('accumulateHave').value) || 0;
+        const accumulateUsed = parseFloat(document.getElementById('accumulateUsed').value) || 0;
+        const accumulateAdd = parseFloat(document.getElementById('accumulateAdd').value) || 0;
     
-      const message = 
+        const accumulateRemain = accumulateHave + accumulateAdd - accumulateUsed;
+    
+        const message = 
     `🕒 ส่งสรุปเวลาทำงานประจำเดือน
     
     ${name}
@@ -224,24 +231,28 @@
     
     📆 วันหยุดที่มี ${cash} วัน  
     วันหยุดนักขัตฤกษ์ที่มี ${holiday} วัน  
-    รวมทั้งหมด: ${Number(cash) + Number(holiday)} วัน  
-    ใช้ไป ${leaveUsed} วัน
-
+    รวมทั้งหมด: ${cash + holiday} วัน  
+    ใช้ไป ${cashUsed} วัน
+    
     วันหยุดสะสมที่มี ${accumulateHave} วัน
     ใช้ไป ${accumulateUsed} วัน
     สะสมเพิ่ม ${accumulateAdd} วัน
     คงเหลือ: ${accumulateRemain} วัน`;
     
-      liff.sendMessages([{
-        type: "text",
-        text: message
-      }]).then(() => {
+        await liff.sendMessages([{
+          type: "text",
+          text: message
+        }]);
+    
         alert("✅ ส่งข้อความแล้ว");
         liff.closeWindow();
-      }).catch(err => {
-        alert("❌ ไม่สามารถส่งข้อความ: " + err);
-      });
+    
+      } catch (error) {
+        console.error(error);
+        alert("❌ เกิดข้อผิดพลาด: " + error.message);
+      }
     }
+
     
   function calculateRemain() {
     const have = parseFloat(document.getElementById("accumulateHave").value) || 0;
